@@ -49,6 +49,7 @@ class BasePhonemizer(abc.ABC):
         This method may be overloaded in child classes (see Segments backend)
 
         """
+        print(f'self.supported_languages: {self.supported_languages}')
         if not self.is_supported_language(language):
             raise RuntimeError(f'language "{language}" is not supported by the ' f"{self.name()} backend")
         return language

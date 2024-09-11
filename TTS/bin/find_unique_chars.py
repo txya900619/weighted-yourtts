@@ -39,6 +39,28 @@ def main():
     print(f" > Unique characters: {''.join(sorted(chars))}")
     print(f" > Unique lower characters: {''.join(sorted(lower_chars))}")
     print(f" > Unique all forced to lower characters: {''.join(sorted(chars_force_lower))}")
+    
+    contents = [
+        f" > Number of unique characters: {len(chars)}\n",
+        f" > Unique characters: {''.join(sorted(chars))}\n",
+        f" > Unique lower characters: {''.join(sorted(lower_chars))}\n",
+        f" > Unique all forced to lower characters: {''.join(sorted(chars_force_lower))}\n"
+    ]
+
+    # 定義文件名稱
+    file_names = [
+        'unique_characters_count.txt',
+        'unique_characters.txt',
+        'unique_lower_characters.txt',
+        'unique_characters_force_lower.txt'
+    ]
+
+    # 寫入內容到各自的文件
+    for content, file_name in zip(contents, file_names):
+        with open(file_name, 'w', encoding='utf-8') as file:
+            file.write(content)
+
+    print("All files have been written successfully.")
 
 
 if __name__ == "__main__":

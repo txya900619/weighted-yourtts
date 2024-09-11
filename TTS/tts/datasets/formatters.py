@@ -395,7 +395,7 @@ def brspeech(root_path, meta_file, ignored_speakers=None):
     return items
 
 
-def vctk(root_path, meta_files=None, wavs_path="wav48_silence_trimmed", mic="mic1", ignored_speakers=None):
+def vctk(root_path, meta_files=None, wavs_path="wav16_silence_trimmed", mic="mic1", ignored_speakers=None):
     """VCTK dataset v0.92.
 
     URL:
@@ -652,4 +652,95 @@ def bel_tts_formatter(root_path, meta_file, **kwargs):  # pylint: disable=unused
             wav_file = os.path.join(root_path, cols[0])
             text = cols[1]
             items.append({"text": text, "audio_file": wav_file, "speaker_name": speaker_name, "root_path": root_path})
+    return items
+
+def mandarin_drama(root_path, meta_files=None, wavs_path="combined", mic="mic1", ignored_speakers=None):
+    """mandarin_drama dataset.
+    """
+    # print(f'meta_files: {meta_files}')
+    # return
+    items = []
+    df = pd.read_csv(os.path.join(root_path, meta_files))
+    for _, row in df.iterrows():
+        wav_file = os.path.join(root_path, 'trimmed_wav_0', row['name'][:11], row['name']) 
+        # text = row['text']
+        text = row['pinyin']
+        # speaker_id = wav_file.rsplit('/',2)[1]
+        speaker_id = os.path.basename(wav_file).split('.')[0]
+        if os.path.exists(wav_file):
+            if 'weight' in row:
+                loss_weight_value = row['weight']
+                if loss_weight_value > 0:
+                    items.append(
+                        {"text": text, "audio_file": wav_file, "speaker_name": speaker_id, "root_path": root_path, "loss_weight": loss_weight_value}
+                    )
+            else:
+                items.append(
+                    {"text": text, "audio_file": wav_file, "speaker_name": speaker_id, "root_path": root_path}
+                )
+        else:
+            print(f" [!] wav files don't exist - {wav_file}")
+    return items
+
+def aishell3_self(root_path, meta_files=None, wavs_path="train/wav", mic="mic1", ignored_speakers=None):
+    """mandarin_drama dataset.
+    """
+    # print(f'meta_files: {meta_files}')
+    # return
+    items = []
+    df = pd.read_csv(os.path.join(root_path, meta_files))
+    for _, row in df.iterrows():
+        wav_file = os.path.join(root_path, wavs_path, row['name'][:11], row['name']) 
+        # text = row['text']
+        text = row['pinyin']
+        # speaker_id = wav_file.rsplit('/',2)[1]
+        speaker_id = os.path.basename(wav_file).split('.')[0]
+        if os.path.exists(wav_file):
+            if 'weight' in row:
+                loss_weight_value = row['weight']
+                if loss_weight_value > 0:
+                    items.append(
+                        {"text": text, "audio_file": wav_file, "speaker_name": speaker_id, "root_path": root_path, "loss_weight": loss_weight_value}
+                    )
+            else:
+                items.append(
+                    {"text": text, "audio_file": wav_file, "speaker_name": speaker_id, "root_path": root_path}
+                )
+        else:
+            print(f" [!] wav files don't exist - {wav_file}")
+    return items
+
+def aishell3(root_path, meta_files='train/label_train-set.txt', wavs_path="train/wav", mic="mic1", ignored_speakers=None):
+    """mandarin_drama dataset.
+    """
+    # print(f'meta_files: {meta_files}')
+    # return
+    items = []
+    
+    with open(os.path.join(root_path, meta_files), 'r', encoding='utf-8') as file:
+        lines = file.readlines()
+    # 處理每一行
+    for line in lines:
+        # 只處理包含 | 的行
+        if "|" in line:
+            parts = line.strip().split('|')
+            ssb_code = parts[0]  # SSB 編號
+            pinyin_sentence = parts[1]  
+
+            # 去除 $ 和 % 符號
+            cleaned_sentence = re.sub(r'[%$]', '', pinyin_sentence).strip()
+
+            wav_file = os.path.join(root_path, wavs_path, ssb_code[:7], f'{ssb_code}.wav') 
+            # text = row['text']
+            text = cleaned_sentence
+            
+            speaker_id = os.path.basename(wav_file).split('.')[0]
+            if os.path.exists(wav_file):
+                items.append(
+                        {"text": text, "audio_file": wav_file, "speaker_name": speaker_id, "root_path": root_path}
+                    )
+            else:
+                print(f" [!] wav files don't exist - {wav_file}")
+    
+    
     return items

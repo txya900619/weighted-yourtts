@@ -48,10 +48,10 @@ def split_dataset(items, eval_split_max_size=None, eval_split_size=0.01):
         while len(items_eval) < eval_split_size:
             item_idx = np.random.randint(0, len(items))
             speaker_to_be_removed = items[item_idx]["speaker_name"]
-            if speaker_counter[speaker_to_be_removed] > 1:
-                items_eval.append(items[item_idx])
-                speaker_counter[speaker_to_be_removed] -= 1
-                del items[item_idx]
+            # if speaker_counter[speaker_to_be_removed] > 1:
+            items_eval.append(items[item_idx])
+            speaker_counter[speaker_to_be_removed] -= 1
+            del items[item_idx]
         return items_eval, items
     return items[:eval_split_size], items[eval_split_size:]
 

@@ -70,5 +70,27 @@ def main():
     print(f" > Unique all forced to lower phonemes: {''.join(sorted(phones_force_lower))}")
 
 
+    contents = [
+        f" > Number of unique characters: {len(phones)}\n",
+        f" > Unique characters: {''.join(sorted(phones))}\n",
+        f" > Unique lower characters: {''.join(sorted(lower_phones))}\n",
+        f" > Unique all forced to lower characters: {''.join(sorted(phones_force_lower))}\n"
+    ]
+    
+    # 定義文件名稱
+    file_names = [
+        'unique_phones_count.txt',
+        'unique_phones.txt',
+        'unique_lower_phones.txt',
+        'unique_phones_force_lower.txt'
+    ]
+
+    # 寫入內容到各自的文件
+    for content, file_name in zip(contents, file_names):
+        with open(file_name, 'w', encoding='utf-8') as file:
+            file.write(content)
+
+    print("All files have been written successfully.")
+
 if __name__ == "__main__":
     main()

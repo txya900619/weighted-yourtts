@@ -297,6 +297,9 @@ class BaseCharacters:
 
     def char_to_id(self, char: str) -> int:
         try:
+            # assert (
+            #     self._char_to_id[char] <= len(self._char_to_id)
+            # ), f" {char} is {self._char_to_id[char]}, over len(self._char_to_id): {len(self._char_to_id)} "
             return self._char_to_id[char]
         except KeyError as e:
             raise KeyError(f" [!] {repr(char)} is not in the vocabulary.") from e

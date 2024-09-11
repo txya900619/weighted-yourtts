@@ -84,7 +84,9 @@ class TextEncoder(nn.Module):
             - x_length: :math:`[B]`
         """
         assert x.shape[0] == x_lengths.shape[0]
+        # print(f'before x: {x}')
         x = self.emb(x) * math.sqrt(self.hidden_channels)  # [b, t, h]
+        # print(f'after x: {x}')
 
         # concat the lang emb in embedding chars
         if lang_emb is not None:

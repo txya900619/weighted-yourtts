@@ -69,3 +69,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# python -m trainer.distribute --script TTS/bin/train_tts.py --config_path tts_models--multilingual--multi-dataset--your_tts/config.json --gpus "1,2,3"
+# tts --text "Text for TTS" --out_path output/path/speech.wav --model_path path/to/model.pth --config_path path/to/config.json --speakers_file_path path/to/speaker.json --speaker_idx VCTK_p374

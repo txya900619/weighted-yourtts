@@ -169,3 +169,14 @@ def no_cleaners(text):
     # remove newline characters
     text = text.replace("\n", "")
     return text
+
+def mandarin_drama_cleaners(text):
+    """Basic pipeline that lowercases and collapses whitespace without transliteration."""
+    text = lowercase(text)
+    text = text.replace(',', ' ')
+    text = text.replace('[', ' ')
+    text = text.replace(']', ' ')
+    text = text.replace('\'', ' ')
+    text = text.replace('none', ' ')
+    text = collapse_whitespace(text)
+    return text

@@ -271,6 +271,7 @@ class VitsDataset(TTSDataset):
         wav_filename = os.path.basename(item["audio_file"])
 
         token_ids = self.get_token_ids(idx, item["text"])
+        # print(f'token_ids: {token_ids}')
 
         # after phonemization the text length may change
         # this is a shameful 🤭 hack to prevent longer phonemes
@@ -1251,6 +1252,7 @@ class Vits(BaseTTS):
             language_ids = batch["language_ids"]
             waveform = batch["waveform"]
 
+            # print(f'tokens: {tokens}')
             # generator pass
             outputs = self.forward(
                 tokens,
@@ -1477,7 +1479,8 @@ class Vits(BaseTTS):
         # get d_vectors from audio file names
         if self.speaker_manager is not None and self.speaker_manager.embeddings and self.args.use_d_vector_file:
             d_vector_mapping = self.speaker_manager.embeddings
-            d_vectors = [d_vector_mapping[w]["embedding"] for w in batch["audio_unique_names"]]
+            # d_vectors = [d_vector_mapping[f"/mnt/md1/user_wago/data/mandarin_drama/{w.split('#')[1]}.wav"]["embedding"] for w in batch["audio_unique_names"]]
+            d_vectors = [d_vector_mapping[f"{w}"]["embedding"] for w in batch["audio_unique_names"]]
             d_vectors = torch.FloatTensor(d_vectors)
 
         # get language ids from language names
