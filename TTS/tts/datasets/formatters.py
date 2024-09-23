@@ -741,6 +741,96 @@ def aishell3(root_path, meta_files='train/label_train-set.txt', wavs_path="train
                     )
             else:
                 print(f" [!] wav files don't exist - {wav_file}")
-    
-    
+
+def parse_ipa(ipa: str):
+    text = []
+    delete_chars = "\-\_\|\+"
+    # delete_chars="\+\-\|\_"
+    as_space = ""
+
+    ipa_list = re.split(r"(?<![\d])(?=[\d])|(?<=[\d])(?![\d])", ipa)
+    for word in ipa_list:
+        if word.isdigit():
+            text.append(word)
+        else:
+            if len(as_space) > 0:
+                word = re.sub(r"[{}]".format(as_space), " ", word)
+            if len(delete_chars) > 0:
+                word = re.sub(r"[{}]".format(delete_chars), "", word)
+
+            word = word.replace("，", " ， ")
+            word = re.sub(r"\s+", " ", word)
+            # word = word.replace("，", " ")
+            text.extend(word)
+
+    return text
+
+
+def matbn(root_path, meta_file, ignored_speakers=None):  # pylint: disable=unused-argument
+    json_file = os.path.join(root_path, meta_file)
+    items = []
+    with open(json_file, "r", encoding="utf-8") as f:
+        json_lines = f.readlines()
+        json_lines = f"[{','.join(json_lines)}]"
+        unprocess_items = json.loads(json_lines)
+        for unprocess_item in unprocess_items:
+            audio_file = os.path.join(root_path, unprocess_item["audio_path"])
+            if unprocess_item["ipa"] is None or "OOV" in unprocess_item["ipa"]:
+                continue
+            # text = unprocess_item["ipa"].replace("-", "").replace("_", "").replace("，", " ， ")
+            text = parse_ipa(unprocess_item["ipa"])
+            # tone as a separate token
+
+            speaker_name = os.path.basename(audio_file).split(".")[0]
+
+            items.append(
+                {
+                    "text": text,
+                    "audio_file": audio_file,
+                    "root_path": root_path,
+                    "speaker_name": speaker_name,
+                }
+            )
+    return items
+
+
+def matbn_w(root_path, meta_file, ignored_speakers=None):  # pylint: disable=unused-argument
+    json_file = os.path.join(root_path, meta_file)
+    items = []
+    weight_map = {}
+    df = pd.read_csv(
+        os.path.join(
+            root_path, "/home/wayne/MOS/matbn_train_alpha_3.1426870822906494.csv"
+        )
+    )
+    for _, row in df.iterrows():
+        id = os.path.basename(row["filename"]).split(".")[0]
+        weight_map[id] = row["weight"]
+
+    with open(json_file, "r", encoding="utf-8") as f:
+        json_lines = f.readlines()
+        json_lines = f"[{','.join(json_lines)}]"
+        unprocess_items = json.loads(json_lines)
+        for unprocess_item in unprocess_items:
+            audio_file = os.path.join(root_path, unprocess_item["audio_path"])
+            if unprocess_item["ipa"] is None or "OOV" in unprocess_item["ipa"]:
+                continue
+            # text = unprocess_item["ipa"].replace("-", "").replace("_", "").replace("，", " ， ")
+            text = parse_ipa(unprocess_item["ipa"])
+            # tone as a separate token
+
+            speaker_name = os.path.basename(audio_file).split(".")[0]
+
+            if speaker_name not in weight_map:
+                continue
+
+            items.append(
+                {
+                    "text": text,
+                    "audio_file": audio_file,
+                    "root_path": root_path,
+                    "speaker_name": speaker_name,
+                    "loss_weight": weight_map[speaker_name],
+                }
+            )
     return items
